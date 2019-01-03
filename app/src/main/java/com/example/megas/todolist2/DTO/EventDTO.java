@@ -1,6 +1,8 @@
 package com.example.megas.todolist2.DTO;
 
-public class EventDTO {
+import java.io.Serializable;
+
+public class EventDTO implements Serializable {
     int id, eventId, type, notiday, status, color, objectId;
     String eventName, comment, daytime;
 

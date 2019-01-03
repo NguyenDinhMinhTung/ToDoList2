@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="line_thinkness" type="dimen" format="float">0.5dp</item>
+    <dimen name="line_think">0.5dp</dimen>
 </resources>
