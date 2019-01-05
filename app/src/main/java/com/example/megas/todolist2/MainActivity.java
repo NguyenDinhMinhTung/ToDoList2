@@ -15,6 +15,8 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.megas.todolist2.Adapter.MainListAdapter;
@@ -51,33 +53,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setEvent();
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_action_more_vert)
-                        .setContentTitle("My notification")
-                        .setContentText("Hello World!");
-// Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, MainActivity.class);
-
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-// Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(MainActivity.class);
-// Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
-        mNotificationManager.notify(111, mBuilder.build());
+        Intent intent = new Intent(this, UpdateService.class);
+        startService(intent);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -93,8 +70,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             tmpList.sort(new Comparator<EventDTO>() {
                 @Override
                 public int compare(EventDTO eventDTO1, EventDTO eventDTO2) {
-                    _Date dt1=Ulti.addDay(_Date.Parse(eventDTO1.getDaytime()),-eventDTO1.getNotiday());
-                    _Date dt2=Ulti.addDay(_Date.Parse(eventDTO2.getDaytime()),-eventDTO2.getNotiday());
+                    _Date dt1 = Ulti.addDay(_Date.Parse(eventDTO1.getDaytime()), -eventDTO1.getNotiday());
+                    _Date dt2 = Ulti.addDay(_Date.Parse(eventDTO2.getDaytime()), -eventDTO2.getNotiday());
 
                     return dt1.compareTo(dt2);
                 }
@@ -104,11 +81,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             List<List<EventDTO>> list = new ArrayList<>();
             list.add(new ArrayList<EventDTO>());
-            list.get(0).add(new EventDTO(0,0,-1,new _Date().toString(),0,0,0,0,"",""));
+            list.get(0).add(new EventDTO(0, 0, -1, new _Date().toString(), 0, 0, 0, 0, "", ""));
 
             //llist[0].size()==1: ngày hôm nay trống
             for (EventDTO eventDTO : tmpList) {
-                String d=Ulti.addDay(_Date.Parse(eventDTO.getDaytime()), -eventDTO.getNotiday()).toDateString();
+                String d = Ulti.addDay(_Date.Parse(eventDTO.getDaytime()), -eventDTO.getNotiday()).toDateString();
                 if (Ulti.addDay(_Date.Parse(eventDTO.getDaytime()), -eventDTO.getNotiday()).toDateString().compareTo(now) > 0) {
                     list.add(new ArrayList<EventDTO>());
                     now = eventDTO.getDaytime().split(" ")[0];
@@ -154,5 +131,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
 
         generateList();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.mnuSetting:
+                Intent intent = new Intent(this, SettingActivity.class);
+                startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

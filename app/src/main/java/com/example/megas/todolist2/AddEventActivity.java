@@ -2,6 +2,8 @@ package com.example.megas.todolist2;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -127,6 +129,7 @@ public class AddEventActivity extends AppCompatActivity implements View.OnClickL
         return super.onOptionsItemSelected(item);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onClick(View view) {
         int viewId = view.getId();
@@ -169,6 +172,9 @@ public class AddEventActivity extends AppCompatActivity implements View.OnClickL
 
                         eventsDAO.update(eventDTO);
                     }
+
+                    Ulti.pushNotification(this);
+
                     finish();
                 }
                 break;

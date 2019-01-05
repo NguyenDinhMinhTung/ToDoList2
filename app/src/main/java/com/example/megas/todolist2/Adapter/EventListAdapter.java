@@ -4,7 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -101,6 +103,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
                 popupMenu.getMenuInflater().inflate(R.menu.menu_popup_event_item, popupMenu.getMenu());
 
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         if (menuItem.getTitle().equals("編集")) {
@@ -113,6 +116,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
                             eventDTOList.remove(eventDTO);
 
                             notifyDataSetChanged();
+                            Ulti.pushNotification(context);
                         }
                         return false;
                     }
@@ -123,6 +127,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
         });
 
         eventListAdapterViewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (checked) {
@@ -134,6 +139,8 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
 
                     eventsDAO.updateStatus(eventDTO.getId(), 0);
                 }
+
+                Ulti.pushNotification(context);
             }
         });
     }
