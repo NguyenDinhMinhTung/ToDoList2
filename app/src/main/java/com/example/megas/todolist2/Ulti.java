@@ -2,11 +2,13 @@ package com.example.megas.todolist2;
 
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -26,7 +28,9 @@ import java.util.List;
 public class Ulti {
     public static final int NOTIFICATION_ID = 111;
 
-    public static final String SHARED_PREFERENCES_NAME="todolist";
+    public static final String SHARED_PREFERENCES_NAME = "todolist";
+    public static final String IS_SHOW_NOTIFICATION = "isShowNotification";
+
 
     public static int[] colors = {Color.rgb(255, 255, 255),
             Color.rgb(255, 112, 67),
@@ -84,7 +88,21 @@ public class Ulti {
                 }
 
                 if (eventDTO.getStatus() == 1) continue;
-                listResult.add(eventDTO.getEventName());
+
+                long dayRemaining;
+                String remaining = "";
+
+                Date date1 = _Date.Parse(eventDTO.getDaytime()).toDate();
+                Date date2 = Calendar.getInstance().getTime();
+                long diff = date1.getTime() - date2.getTime();
+                dayRemaining = (long) (diff / (1000.0 * 60 * 60 * 24));
+
+                if (dayRemaining > 0) {
+                    remaining = ("（後" + dayRemaining + "日）");
+                } else {
+                    remaining = "（今日）";
+                }
+                listResult.add("・"+eventDTO.getEventName() + remaining);
             }
 
             if (listResult.size() > 0) {
@@ -103,13 +121,36 @@ public class Ulti {
     @TargetApi(Build.VERSION_CODES.N)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public static void pushNotification(Context context) {
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        String CHANNEL_ID = "my_channel_01";
+        CharSequence name = "my_channel";
+        String Description = "This is my channel";
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+            //mChannel.setDescription(Description);
+            mChannel.enableLights(false);
+            //mChannel.setLightColor(Color.RED);
+            mChannel.enableVibration(false);
+            //mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            mChannel.setShowBadge(false);
+            mChannel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(mChannel);
+        }
+
+        String even=getEvent(context);
+
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
+                new NotificationCompat.Builder(context, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_to_do_list)
                         .setContentTitle(new SimpleDateFormat("MM月dd日").format(new Date()))
-                        .setContentText("Much longer text that cannot fit one line...")
+                        .setContentText(even.split(System.lineSeparator())[0]+"...")
                         .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(getEvent(context)))
+                                .bigText(even))
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 // Creates an explicit intent for an Activity in your app
         //mBuilder.setOngoing(true);
@@ -130,8 +171,7 @@ public class Ulti {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
         mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
         //cancelNotification(mNotificationManager);
 // mId allows you to update the notification later on.
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
@@ -143,7 +183,7 @@ public class Ulti {
         mNotificationManager.cancel(NOTIFICATION_ID);
     }
 
-    public static void cancelAlarm(Context context){
+    public static void cancelAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, UpdateService.class);
         PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, 0);

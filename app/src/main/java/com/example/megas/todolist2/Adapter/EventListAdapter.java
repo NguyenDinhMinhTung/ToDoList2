@@ -3,6 +3,7 @@ package com.example.megas.todolist2.Adapter;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -131,25 +132,27 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (checked) {
-                    setPaintFlags(eventListAdapterViewHolder, Paint.STRIKE_THRU_TEXT_FLAG);
+        setPaintFlags(eventListAdapterViewHolder, Paint.STRIKE_THRU_TEXT_FLAG);
 
-                    eventsDAO.updateStatus(eventDTO.getId(), 1);
-                } else {
-                    setPaintFlags(eventListAdapterViewHolder, 0);
+        eventsDAO.updateStatus(eventDTO.getId(), 1);
+    } else {
+        setPaintFlags(eventListAdapterViewHolder, 0);
 
-                    eventsDAO.updateStatus(eventDTO.getId(), 0);
-                }
-
-                Ulti.pushNotification(context);
-            }
-        });
+        eventsDAO.updateStatus(eventDTO.getId(), 0);
     }
 
-    private void setPaintFlags(EventListAdapterViewHolder mainListAdapterViewHolder, int flags) {
+    SharedPreferences sharedPreferences = context.getSharedPreferences(Ulti.SHARED_PREFERENCES_NAME, context.MODE_PRIVATE);
+                if (sharedPreferences.getBoolean(Ulti.IS_SHOW_NOTIFICATION, false))
+            Ulti.pushNotification(context);
+}
+        });
+                }
+
+private void setPaintFlags(EventListAdapterViewHolder mainListAdapterViewHolder, int flags) {
         mainListAdapterViewHolder.txtEventName.setPaintFlags(flags);
         mainListAdapterViewHolder.txtComment.setPaintFlags(flags);
         mainListAdapterViewHolder.txtTime.setPaintFlags(flags);
-    }
+        }
 
     @Override
     public int getItemCount() {

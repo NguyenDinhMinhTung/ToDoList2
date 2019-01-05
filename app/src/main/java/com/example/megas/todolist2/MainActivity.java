@@ -55,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Intent intent = new Intent(this, UpdateService.class);
         startService(intent);
+
+        HttpRequest httpRequest=new HttpRequest(this, "https://www.google.com/");
+        httpRequest.start();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -83,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             list.add(new ArrayList<EventDTO>());
             list.get(0).add(new EventDTO(0, 0, -1, new _Date().toString(), 0, 0, 0, 0, "", ""));
 
-            //llist[0].size()==1: ngày hôm nay trống
+            //list[0].size()==1: ngày hôm nay trống
             for (EventDTO eventDTO : tmpList) {
                 String d = Ulti.addDay(_Date.Parse(eventDTO.getDaytime()), -eventDTO.getNotiday()).toDateString();
                 if (Ulti.addDay(_Date.Parse(eventDTO.getDaytime()), -eventDTO.getNotiday()).toDateString().compareTo(now) > 0) {
