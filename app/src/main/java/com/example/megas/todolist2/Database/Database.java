@@ -12,6 +12,7 @@ public class Database extends SQLiteOpenHelper {
     public static final String TB_SYNCQUEUES_ID = "id";
     public static final String TB_SYNCQUEUES_EVENTID = "eventid";
     public static final String TB_SYNCQUEUES_STATUS = "status";
+    public static final String TB_SYNCQUEUES_TYPE = "type";
 
     public static final String TB_EVENTS_ID = "id";
     public static final String TB_EVENTS_EVENTID = "eventid";
@@ -34,7 +35,8 @@ public class Database extends SQLiteOpenHelper {
                 + TB_EVENTS_TYPE + " INTEGER NOT NULL, " + TB_EVENTS_DAYTIME + " TEXT NOT NULL," + TB_EVENTS_NOTIDAY + " INTEGER NOT NULL, " + TB_EVENTS_STATUS + " INTEGER NOT NULL, " + TB_EVENTS_COLOR +
                 " INTEGER NOT NULL," + TB_EVENTS_OBJECTID + " INTEGER, " + TB_EVENTS_COMMENT + " TEXT)";
 
-        String tbSYNCQUEUES = "CREATE TABLE " + TB_SYNCQUEUES + "(" + TB_SYNCQUEUES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TB_SYNCQUEUES_EVENTID + " INTEGER NOT NULL, " + TB_SYNCQUEUES_STATUS + " INTEGER NOT NULL)";
+        String tbSYNCQUEUES = "CREATE TABLE " + TB_SYNCQUEUES + "(" + TB_SYNCQUEUES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TB_SYNCQUEUES_EVENTID + " INTEGER NOT NULL, "
+                + TB_SYNCQUEUES_STATUS + " INTEGER NOT NULL, " + TB_SYNCQUEUES_TYPE + " INTEGER NOT NULL)";
 
         db.execSQL(tbEVENTS);
         db.execSQL(tbSYNCQUEUES);
@@ -45,7 +47,7 @@ public class Database extends SQLiteOpenHelper {
 
     }
 
-    public SQLiteDatabase Open(){
+    public SQLiteDatabase Open() {
         return this.getWritableDatabase();
     }
 }

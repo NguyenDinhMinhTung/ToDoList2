@@ -55,9 +55,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Intent intent = new Intent(this, UpdateService.class);
         startService(intent);
-
-        HttpRequest httpRequest=new HttpRequest(this, "https://www.google.com/");
-        httpRequest.start();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -142,12 +139,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mnuSetting:
                 Intent intent = new Intent(this, SettingActivity.class);
                 startActivity(intent);
+                break;
+
+            case R.id.mnuUpdate:
+                _Date date = new _Date();
+                date.setHour(0);
+                date.setMinute(0);
+                date.setSecond(0);
+
+                Sync.StartSyncToServer(this);
+                Sync.StartSyncFromServer(this, date, new Sync.Action() {
+                    @Override
+                    public void Action() {
+                        generateList();
+                    }
+                });
+
+                //generateList();
+
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

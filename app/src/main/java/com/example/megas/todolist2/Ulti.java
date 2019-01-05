@@ -31,7 +31,6 @@ public class Ulti {
     public static final String SHARED_PREFERENCES_NAME = "todolist";
     public static final String IS_SHOW_NOTIFICATION = "isShowNotification";
 
-
     public static int[] colors = {Color.rgb(255, 255, 255),
             Color.rgb(255, 112, 67),
             Color.rgb(156, 204, 101),

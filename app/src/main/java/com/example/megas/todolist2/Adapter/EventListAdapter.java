@@ -24,6 +24,7 @@ import com.example.megas.todolist2.AddEventActivity;
 import com.example.megas.todolist2.DAO.EventsDAO;
 import com.example.megas.todolist2.DTO.EventDTO;
 import com.example.megas.todolist2.R;
+import com.example.megas.todolist2.Sync;
 import com.example.megas.todolist2.Ulti;
 import com.example.megas.todolist2._Date;
 
@@ -107,17 +108,20 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
                     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-                        if (menuItem.getTitle().equals("編集")) {
+                        if (menuItem.getItemId()==R.id.mnuEditEventItem) {
                             Intent intent = new Intent(context, AddEventActivity.class);
                             intent.putExtra("EventDTO", eventDTO);
 
                             context.startActivity(intent);
-                        } else if (menuItem.getTitle().equals("削除")) {
+                        } else if (menuItem.getItemId()==R.id.mnuDeleteEventItem) {
                             eventsDAO.delete(eventDTO.getId());
                             eventDTOList.remove(eventDTO);
 
                             notifyDataSetChanged();
                             Ulti.pushNotification(context);
+
+                            Sync.PushToSyncQueue(context, eventDTO.getEventId(), 2);
+                            Sync.StartSyncToServer(context);
                         }
                         return false;
                     }
@@ -132,27 +136,30 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.Even
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (checked) {
-        setPaintFlags(eventListAdapterViewHolder, Paint.STRIKE_THRU_TEXT_FLAG);
+                    setPaintFlags(eventListAdapterViewHolder, Paint.STRIKE_THRU_TEXT_FLAG);
 
-        eventsDAO.updateStatus(eventDTO.getId(), 1);
-    } else {
-        setPaintFlags(eventListAdapterViewHolder, 0);
+                    eventsDAO.updateStatus(eventDTO.getId(), 1);
+                } else {
+                    setPaintFlags(eventListAdapterViewHolder, 0);
 
-        eventsDAO.updateStatus(eventDTO.getId(), 0);
-    }
-
-    SharedPreferences sharedPreferences = context.getSharedPreferences(Ulti.SHARED_PREFERENCES_NAME, context.MODE_PRIVATE);
-                if (sharedPreferences.getBoolean(Ulti.IS_SHOW_NOTIFICATION, false))
-            Ulti.pushNotification(context);
-}
-        });
+                    eventsDAO.updateStatus(eventDTO.getId(), 0);
                 }
 
-private void setPaintFlags(EventListAdapterViewHolder mainListAdapterViewHolder, int flags) {
+                SharedPreferences sharedPreferences = context.getSharedPreferences(Ulti.SHARED_PREFERENCES_NAME, context.MODE_PRIVATE);
+                if (sharedPreferences.getBoolean(Ulti.IS_SHOW_NOTIFICATION, false))
+                    Ulti.pushNotification(context);
+
+                Sync.PushToSyncQueue(context, eventDTO.getId(), 1);
+                Sync.StartSyncToServer(context);
+            }
+        });
+    }
+
+    private void setPaintFlags(EventListAdapterViewHolder mainListAdapterViewHolder, int flags) {
         mainListAdapterViewHolder.txtEventName.setPaintFlags(flags);
         mainListAdapterViewHolder.txtComment.setPaintFlags(flags);
         mainListAdapterViewHolder.txtTime.setPaintFlags(flags);
-        }
+    }
 
     @Override
     public int getItemCount() {

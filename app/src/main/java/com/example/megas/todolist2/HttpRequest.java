@@ -18,7 +18,7 @@ public class HttpRequest extends Thread {
     String url;
     Context context;
 
-    public HttpRequest(Context context, String url) {
+    public HttpRequest(String url) {
         this.url = url;
     }
 

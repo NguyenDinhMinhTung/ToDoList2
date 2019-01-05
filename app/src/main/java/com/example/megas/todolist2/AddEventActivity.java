@@ -95,14 +95,14 @@ public class AddEventActivity extends AppCompatActivity implements View.OnClickL
         spnColorAdapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         spnColor.setAdapter(spnColorAdapter);
 
-        if (eventDTO!=null){
+        if (eventDTO != null) {
             txtEventName.setText(eventDTO.getEventName());
             txtNotifyDay.setText(String.valueOf(eventDTO.getNotiday()));
             txtComment.setText(eventDTO.getComment());
 
-            ckbAddDay.setChecked(eventDTO.getStatus()==1);
+            ckbAddDay.setChecked(eventDTO.getStatus() == 1);
 
-            date=_Date.Parse(eventDTO.getDaytime());
+            date = _Date.Parse(eventDTO.getDaytime());
 
             spnColor.setSelection(eventDTO.getColor());
 
@@ -155,13 +155,17 @@ public class AddEventActivity extends AppCompatActivity implements View.OnClickL
                     int notifyDay = Integer.parseInt(txtNotifyDay.getText().toString());
                     int color = spnColor.getSelectedItemPosition();
                     int type = ckbAddDay.isChecked() ? 1 : 0;
-                    int objectId=0;
+                    int objectId = 0;
+
+                    int id;
 
                     if (eventDTO == null) {
                         eventDTO = new EventDTO(0, -1, type, daytime, notifyDay, 0, color, objectId, evenName, comment);
-                        eventsDAO.addEvent(eventDTO);
+                        id = eventsDAO.addEvent(eventDTO);
 
                     } else {
+                        id = eventDTO.getId();
+
                         eventDTO.setType(type);
                         eventDTO.setDaytime(daytime);
                         eventDTO.setNotiday(notifyDay);
@@ -173,8 +177,10 @@ public class AddEventActivity extends AppCompatActivity implements View.OnClickL
                         eventsDAO.update(eventDTO);
                     }
 
-                    Ulti.pushNotification(this);
+                    Sync.PushToSyncQueue(this, id, 1);
+                    Sync.StartSyncToServer(this);
 
+                    Ulti.pushNotification(this);
                     finish();
                 }
                 break;
