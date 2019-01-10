@@ -26,7 +26,7 @@ public class Database extends SQLiteOpenHelper {
     public static final String TB_EVENTS_COMMENT = "COMMENT";
 
     public Database(Context context) {
-        super(context, "TODOLIST", null, 1);
+        super(context, "TODOLIST", null, 3);
     }
 
     @Override
@@ -44,7 +44,10 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TB_SYNCQUEUES);
+        db.execSQL("DROP TABLE IF EXISTS " + TB_EVENTS);
 
+        onCreate(db);
     }
 
     public SQLiteDatabase Open() {

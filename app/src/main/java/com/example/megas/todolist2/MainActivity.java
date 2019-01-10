@@ -149,18 +149,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.mnuUpdate:
-                _Date date = new _Date();
+                final _Date date = new _Date();
                 date.setHour(0);
                 date.setMinute(0);
                 date.setSecond(0);
 
-                Sync.StartSyncToServer(this);
-                Sync.StartSyncFromServer(this, date, new Sync.Action() {
+//                Sync.StartSyncToServer(this);
+//                Sync.StartSyncFromServer(this, date, new Sync.Action() {
+//                    @Override
+//                    public void Action() {
+//                        generateList();
+//                    }
+//                });
+
+                Thread thread=new Thread(new Runnable() {
                     @Override
-                    public void Action() {
-                        generateList();
+                    public void run() {
+                        if (Sync.startSyncToServer2(MainActivity.this)==0){
+                            Sync.StartSyncFromServer(MainActivity.this, date, new Sync.Action() {
+                                @Override
+                                public void Action() {
+                                    generateList();
+                                }
+                            });
+                        }
                     }
                 });
+                thread.start();
 
                 //generateList();
 

@@ -37,6 +37,10 @@ public class SyncQueueDAO {
         contentValues.put(Database.TB_SYNCQUEUES_TYPE, syncQueueDTO.getType());
 
         database.insert(Database.TB_SYNCQUEUES, null, contentValues);
+
+        int a=this.getList().size();
+
+        int b=0;
     }
 
     public List<SyncQueueDTO> getList() {

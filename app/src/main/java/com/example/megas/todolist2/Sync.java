@@ -7,13 +7,20 @@ import com.example.megas.todolist2.DAO.SyncQueueDAO;
 import com.example.megas.todolist2.DTO.EventDTO;
 import com.example.megas.todolist2.DTO.SyncQueueDTO;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Sync {
-    public static String push_url = "http://192.168.100.116/push_data.php";
-    public static String get_url = "http://192.168.100.116/get_data.php";
-    public static String check_version_url = "http://192.168.100.116/check_version.php";
+    public static String hostIp = "158.215.228.174";
+    public static String push_url = "http://" + hostIp + "/push_data.php";
+    public static String get_url = "http://" + hostIp + "/get_data.php";
+    public static String check_version_url = "http://" + hostIp + "/check_version.php";
 
     public static void PushToSyncQueue(Context context, int id, int type) {
         SyncQueueDAO syncQueueDAO = new SyncQueueDAO(context);
@@ -57,8 +64,69 @@ public class Sync {
         }).execute(url);
     }
 
+    public static int startSyncToServer2(Context context) {
+        final SyncQueueDAO syncQueueDAO = new SyncQueueDAO(context);
+        EventsDAO eventsDAO = new EventsDAO(context);
+
+        List<SyncQueueDTO> syncQueueDTOList = syncQueueDAO.getList();
+
+        for (final SyncQueueDTO syncQueueDTO : syncQueueDTOList) {
+            if (syncQueueDTO.getType() == 1) {
+                EventDTO eventDTO = eventsDAO.getEventById(syncQueueDTO.getEventId());
+
+                if (eventDTO != null) {
+                    String url = String.format("%s?evenid=%d&evenname=%s&type=%d&daytime=%s&notiday=%d&status=%d&color=%d&objectid=%d&comment=%s",
+                            push_url, eventDTO.getEventId(), eventDTO.getEventName(), eventDTO.getType(), eventDTO.getDaytime(), eventDTO.getNotiday(),
+                            eventDTO.getStatus(), eventDTO.getColor(), eventDTO.getObjectId(), eventDTO.getComment());
+
+                    if (HttpRequest(url).toUpperCase().equals("OK")) {
+                        syncQueueDAO.setSynced(syncQueueDTO.getId());
+                    } else {
+                        return 1;
+                    }
+                }
+
+            } else if (syncQueueDTO.getType() == 2) {
+                String url = String.format("%s?delete_id=%d",
+                        push_url, syncQueueDTO.getEventId());
+                if (HttpRequest(url).toUpperCase().equals("OK")) {
+                    syncQueueDAO.setSynced(syncQueueDTO.getId());
+                } else {
+                    return 1;
+                }
+            }
+        }
+
+        return 0;
+    }
+
     public static void getServerVersion() {
 
+    }
+
+    public static String HttpRequest(String url) {
+        URLConnection connection = null;
+        String result = "";
+
+        try {
+            connection = (new URL(url)).openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.connect();
+
+            InputStream in = connection.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuilder html = new StringBuilder();
+            for (String line; (line = reader.readLine()) != null; ) {
+                html.append(line);
+            }
+            in.close();
+            result = html.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     public static void StartSyncToServer(Context context) {

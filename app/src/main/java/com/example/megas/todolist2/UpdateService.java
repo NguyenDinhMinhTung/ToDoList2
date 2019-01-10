@@ -41,6 +41,6 @@ public class UpdateService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        Ulti.cancelAlarm(this);
+        //Ulti.cancelAlarm(this);
     }
 }
