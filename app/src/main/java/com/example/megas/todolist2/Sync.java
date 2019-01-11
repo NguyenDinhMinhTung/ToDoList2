@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sync {
-    public static String hostIp = "158.215.228.174";
+    public static String hostIp = "10.228.130.69";
     public static String push_url = "http://" + hostIp + "/push_data.php";
     public static String get_url = "http://" + hostIp + "/get_data.php";
     public static String check_version_url = "http://" + hostIp + "/check_version.php";

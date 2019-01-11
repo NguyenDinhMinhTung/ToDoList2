@@ -2,6 +2,7 @@ package com.example.megas.todolist2;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
@@ -180,7 +181,9 @@ public class AddEventActivity extends AppCompatActivity implements View.OnClickL
                     Sync.PushToSyncQueue(this, id, 1);
                     Sync.StartSyncToServer(this);
 
-                    Ulti.pushNotification(this);
+                    SharedPreferences sharedPreferences = getSharedPreferences(Ulti.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+                    if (sharedPreferences.getBoolean(Ulti.IS_SHOW_NOTIFICATION, false))
+                        Ulti.pushNotification(this);
                     finish();
                 }
                 break;
